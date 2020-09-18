@@ -2,7 +2,8 @@
 
 Automatically log into OpenVPN server using your combolist!
 
-##Usage
+## Usage
+
 `python main.py <args>`
 
 `--openvpn-path` - Path to `openvpn.exe`, defaults to `ovpn/openvpn.exe`
@@ -21,5 +22,6 @@ Allowed combolist types:
 `mail:pass`
 `mail:pass | YYYY-MM-DD HH:MM:SS`
 
-##Dependencies
+## Dependencies
+
 Install [OpenVPN](https://openvpn.net/community-downloads/) and dump `OpenVPN/bin/` contents into `ovpn/` directory in ovCombo's main directory.
