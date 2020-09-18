@@ -33,7 +33,7 @@ if __name__ == '__main__':
     if any(os.listdir('output/')) == outfile:  # Check if file is existent, if not, remove dates and proceed
         combos = outfile
     else:
-        sv = Sieve(date=True, outfile=outfile)
+        sv = Sieve(date=date, outfile=outfile)
         sv.filter()
         combos = sv.write()
 
