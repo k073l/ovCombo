@@ -59,7 +59,7 @@ class Sieve:
                 else:
                     self.eligible.append(line)  # If false all files are eligible
 
-    def write(self):
+    def write(self) -> str:
         """
         Saves file as filename set earlier, removes dates
         :return: Path to outfile
@@ -81,4 +81,3 @@ if __name__ == '__main__':
     sv = Sieve(date=True, outfile='out.txt')
     sv.filter()
     sv.write()
-

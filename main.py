@@ -1,7 +1,8 @@
-import os
-from sieve import Sieve
-from connector import Connector
 import argparse
+import os
+import ctypes
+from connector import Connector
+from sieve import Sieve
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Connect to OpenVPN server using combolist')
@@ -30,8 +31,16 @@ if __name__ == '__main__':
     date = results.date
     timeout = results.timeout
 
-    if any(os.listdir('output/')) == outfile:  # Check if file is existent, if not, remove dates and proceed
-        combos = outfile
+    try:
+        is_admin = os.getuid() == 0
+    except AttributeError:
+        is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+
+    if not is_admin:
+        raise Exception('Please run as root/admin, since OpenVPN needs admin privileges')
+
+    if os.path.isfile('output/' + outfile):  # Check if file is existent, if not, remove dates and proceed
+        combos = 'output/' + outfile
     else:
         sv = Sieve(date=date, outfile=outfile)
         sv.filter()
@@ -40,7 +49,7 @@ if __name__ == '__main__':
     if config_path is None:
         for filename in os.listdir('ovpn/'):
             if filename.endswith('.ovpn'):
-                config_path = filename
+                config_path = 'ovpn/' + filename
                 break
     cn = Connector(ovpn_path=ovpn_path, config_path=config_path, combos=combos,
                    timeout=timeout)
